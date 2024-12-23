@@ -1,0 +1,226 @@
+swagger: '2.0'
+info:
+  version: '1.0'
+  title: Booking API Collection
+  contact: {}
+host: localhost:8000
+basePath: /api
+securityDefinitions: {}
+schemes:
+- http
+consumes:
+- application/json
+produces:
+- application/json
+paths:
+  /booking/21:
+    get:
+      summary: Get Booking Details
+      tags:
+      - Misc
+      operationId: GetBookingDetails
+      deprecated: false
+      produces:
+      - application/json
+      parameters:
+      - name: Authorization
+        in: header
+        required: false
+        default: Bearer {token}
+        type: string
+      - name: Accept
+        in: header
+        required: true
+        type: string
+        description: ''
+      responses:
+        '200':
+          description: ''
+          headers: {}
+    put:
+      summary: Update Booking
+      tags:
+      - Misc
+      operationId: UpdateBooking
+      deprecated: false
+      produces:
+      - application/json
+      consumes:
+      - application/json
+      parameters:
+      - name: Authorization
+        in: header
+        required: false
+        default: Bearer {token}
+        type: string
+      - name: Accept
+        in: header
+        required: true
+        type: string
+        description: ''
+      - name: Content-Type
+        in: header
+        required: false
+        enum:
+        - application/json
+        type: string
+        description: ''
+      - name: Body
+        in: body
+        required: true
+        description: ''
+        schema:
+          $ref: '#/definitions/UpdateBookingRequest'
+      responses:
+        '200':
+          description: ''
+          headers: {}
+  /booking:
+    post:
+      summary: Create Booking
+      tags:
+      - Misc
+      operationId: CreateBooking
+      deprecated: false
+      produces:
+      - application/json
+      consumes:
+      - application/json
+      parameters:
+      - name: Authorization
+        in: header
+        required: false
+        default: Bearer {token}
+        type: string
+      - name: Accept
+        in: header
+        required: true
+        type: string
+        description: ''
+      - name: Content-Type
+        in: header
+        required: false
+        enum:
+        - application/json
+        type: string
+        description: ''
+      - name: Body
+        in: body
+        required: true
+        description: ''
+        schema:
+          $ref: '#/definitions/CreateBookingRequest'
+      responses:
+        '200':
+          description: ''
+          headers: {}
+  /booking/list:
+    get:
+      summary: List Booking
+      tags:
+      - Misc
+      operationId: ListBooking
+      deprecated: false
+      produces:
+      - application/json
+      parameters:
+      - name: Authorization
+        in: header
+        required: false
+        default: Bearer {token}
+        type: string
+      - name: Accept
+        in: header
+        required: true
+        type: string
+        description: ''
+      responses:
+        '200':
+          description: ''
+          headers: {}
+  /booking/119:
+    delete:
+      summary: Delete Booking
+      tags:
+      - Misc
+      operationId: DeleteBooking
+      deprecated: false
+      produces:
+      - application/json
+      parameters:
+      - name: Authorization
+        in: header
+        required: false
+        default: Bearer {token}
+        type: string
+      - name: Accept
+        in: header
+        required: true
+        type: string
+        description: ''
+      responses:
+        '200':
+          description: ''
+          headers: {}
+definitions:
+  CreateBookingRequest:
+    title: CreateBookingRequest
+    example:
+      user_id: 2
+      schedule_id: 116
+      seat_id:
+      - 15530
+      - 15531
+      services:
+      - 1
+      - 2
+    type: object
+    properties:
+      user_id:
+        type: integer
+        format: int32
+      schedule_id:
+        type: integer
+        format: int32
+      seat_id:
+        type: array
+        items:
+          type: integer
+          format: int32
+      services:
+        type: array
+        items:
+          type: integer
+          format: int32
+    required:
+    - user_id
+    - schedule_id
+    - seat_id
+    - services
+  UpdateBookingRequest:
+    title: UpdateBookingRequest
+    example:
+      seat_id:
+      - 15528
+      - 15529
+      services:
+      - 4
+      - 5
+    type: object
+    properties:
+      seat_id:
+        type: array
+        items:
+          type: integer
+          format: int32
+      services:
+        type: array
+        items:
+          type: integer
+          format: int32
+    required:
+    - seat_id
+    - services
+tags:
+- name: Misc
+  description: ''

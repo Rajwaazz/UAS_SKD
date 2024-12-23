@@ -1,0 +1,312 @@
+{
+    "info": {
+      "name": "Movie Booking App Tests",
+      "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+      {
+        "name": "Get CSRF Token",
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "exec": [
+                "pm.test('Status code is 200', function() {",
+                "    pm.response.to.have.status(200);",
+                "});",
+                "",
+                "pm.test('CSRF token is present', function() {",
+                "    const responseBody = pm.response.text();",
+                "    const csrfMatch = responseBody.match(/<meta name=\"csrf-token\" content=\"([^\"]+)\"/);",
+                "    ",
+                "    pm.expect(csrfMatch).to.not.be.null;",
+                "    ",
+                "    if (csrfMatch) {",
+                "        const csrfToken = csrfMatch[1];",
+                "        pm.collectionVariables.set('csrf-token', csrfToken);",
+                "        console.log('CSRF Token set:', csrfToken);",
+                "    }",
+                "});"
+              ]
+            }
+          }
+        ],
+        "request": {
+          "method": "GET",
+          "url": "{{baseUrl}}"
+        }
+      },
+      {
+        "name": "Admin Authentication",
+        "item": [
+          {
+            "name": "Register Admin",
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "exec": [
+                    "pm.test('Status code is 302 or 200', function() {",
+                    "    pm.expect(pm.response.code).to.be.oneOf([200, 302]);",
+                    "});",
+                    "",
+                    "if (pm.response.code === 302) {",
+                    "    pm.test('Redirects to correct page', function() {",
+                    "        pm.response.to.have.header('Location');",
+                    "        const locationHeader = pm.response.headers.get('Location');",
+                    "        pm.expect(locationHeader).to.include('/admin/login');",
+                    "    });",
+                    "}",
+                    "",
+                    "pm.test('Response structure is correct', function() {",
+                    "    if (pm.response.headers.get('Content-Type').includes('application/json')) {",
+                    "        const responseData = pm.response.json();",
+                    "        ",
+                    "        if (responseData.errors) {",
+                    "            console.log('Validation errors:', responseData.errors);",
+                    "        } else {",
+                    "            pm.expect(responseData.status).to.be.oneOf(['success', true]);",
+                    "        }",
+                    "    }",
+                    "});"
+                  ]
+                }
+              }
+            ],
+            "request": {
+              "method": "POST",
+              "header": [
+                {
+                  "key": "X-CSRF-TOKEN",
+                  "value": "{{csrf-token}}"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/x-www-form-urlencoded"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "urlencoded",
+                "urlencoded": [
+                  {
+                    "key": "_token",
+                    "value": "{{csrf-token}}"
+                  },
+                  {
+                    "key": "name",
+                    "value": "Test Admin"
+                  },
+                  {
+                    "key": "email",
+                    "value": "admin@test.com"
+                  },
+                  {
+                    "key": "password",
+                    "value": "password123"
+                  },
+                  {
+                    "key": "password_confirmation",
+                    "value": "password123"
+                  }
+                ]
+              },
+              "url": "{{baseUrl}}/admin/register"
+            }
+          },
+          {
+            "name": "Login Admin",
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "exec": [
+                    "pm.test('Status code is 302 or 200', function() {",
+                    "    pm.expect(pm.response.code).to.be.oneOf([200, 302]);",
+                    "});",
+                    "",
+                    "if (pm.response.code === 302) {",
+                    "    pm.test('Redirects to dashboard', function() {",
+                    "        pm.response.to.have.header('Location');",
+                    "        const locationHeader = pm.response.headers.get('Location');",
+                    "        pm.expect(locationHeader).to.include('/admin/dashboard');",
+                    "    });",
+                    "}",
+                    "",
+                    "pm.test('Session cookie is set', function() {",
+                    "    pm.expect(pm.cookies.has('laravel_session')).to.be.true;",
+                    "});",
+                    "",
+                    "pm.test('Response structure is correct', function() {",
+                    "    if (pm.response.headers.get('Content-Type').includes('application/json')) {",
+                    "        const responseData = pm.response.json();",
+                    "        ",
+                    "        if (responseData.errors) {",
+                    "            console.log('Login errors:', responseData.errors);",
+                    "        } else {",
+                    "            pm.expect(responseData.status).to.be.oneOf(['success', true]);",
+                    "        }",
+                    "    }",
+                    "});"
+                  ]
+                }
+              }
+            ],
+            "request": {
+              "method": "POST",
+              "header": [
+                {
+                  "key": "X-CSRF-TOKEN",
+                  "value": "{{csrf-token}}"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/x-www-form-urlencoded"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "urlencoded",
+                "urlencoded": [
+                  {
+                    "key": "_token",
+                    "value": "{{csrf-token}}"
+                  },
+                  {
+                    "key": "email",
+                    "value": "admin@test.com"
+                  },
+                  {
+                    "key": "password",
+                    "value": "password123"
+                  }
+                ]
+              },
+              "url": "{{baseUrl}}/admin/login"
+            }
+          }
+        ]
+      },
+      {
+        "name": "Movie Management",
+        "item": [
+          {
+            "name": "Create Movie",
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "exec": [
+                    "pm.test('Status code is 302 or 200', function() {",
+                    "    pm.expect(pm.response.code).to.be.oneOf([200, 302]);",
+                    "});",
+                    "",
+                    "if (pm.response.code === 302) {",
+                    "    pm.test('Redirects to movies list', function() {",
+                    "        pm.response.to.have.header('Location');",
+                    "        const locationHeader = pm.response.headers.get('Location');",
+                    "        pm.expect(locationHeader).to.include('/admin/movies');",
+                    "    });",
+                    "}",
+                    "",
+                    "pm.test('Movie creation response is correct', function() {",
+                    "    if (pm.response.headers.get('Content-Type').includes('application/json')) {",
+                    "        const responseData = pm.response.json();",
+                    "        ",
+                    "        if (responseData.errors) {",
+                    "            console.log('Validation errors:', responseData.errors);",
+                    "        } else {",
+                    "            pm.expect(responseData.status).to.be.oneOf(['success', true]);",
+                    "            if (responseData.data) {",
+                    "                pm.expect(responseData.data).to.have.property('judul');",
+                    "                pm.expect(responseData.data).to.have.property('genre');",
+                    "                pm.expect(responseData.data).to.have.property('tanggalRilis');",
+                    "                pm.collectionVariables.set('movieId', responseData.data.id);",
+                    "            }",
+                    "        }",
+                    "    }",
+                    "});"
+                  ]
+                }
+              }
+            ],
+            "request": {
+              "method": "POST",
+              "header": [
+                {
+                  "key": "X-CSRF-TOKEN",
+                  "value": "{{csrf-token}}"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "formdata",
+                "formdata": [
+                  {
+                    "key": "_token",
+                    "value": "{{csrf-token}}"
+                  },
+                  {
+                    "key": "poster",
+                    "type": "file",
+                    "src": "./test-poster.jpg"
+                  },
+                  {
+                    "key": "judul",
+                    "value": "Test Movie"
+                  },
+                  {
+                    "key": "deskripsi",
+                    "value": "Test movie description"
+                  },
+                  {
+                    "key": "genre[]",
+                    "value": "Action"
+                  },
+                  {
+                    "key": "genre[]",
+                    "value": "Adventure"
+                  },
+                  {
+                    "key": "tanggalRilis",
+                    "value": "2024-01-01"
+                  },
+                  {
+                    "key": "duration",
+                    "value": "120"
+                  }
+                ]
+              },
+              "url": "{{baseUrl}}/admin/movies/store"
+            }
+          }
+        ]
+      }
+    ],
+    "variable": [
+      {
+        "key": "baseUrl",
+        "value": "http://localhost:8000",
+        "type": "string"
+      },
+      {
+        "key": "csrf-token",
+        "value": "",
+        "type": "string"
+      },
+      {
+        "key": "movieId",
+        "value": "",
+        "type": "string"
+      }
+    ]
+  }
